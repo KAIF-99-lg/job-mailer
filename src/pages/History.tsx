@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import API_URL from '../api'
 import { motion } from 'framer-motion'
 import { Search, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 
@@ -39,7 +40,7 @@ export default function History() {
       ...(search && { search }),
       ...(filterStatus !== 'all' && { status: filterStatus }),
     })
-    fetch(`/api/history?${params}`, {
+    fetch(`${API_URL}/history?${params}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
       .then((r) => r.json())
@@ -65,7 +66,7 @@ export default function History() {
 
   const handleRetry = async (id: string) => {
     setRetrying(id)
-    await fetch(`/api/history/retry/${id}`, {
+    await fetch(`${API_URL}/history/retry/${id}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
@@ -74,7 +75,7 @@ export default function History() {
   }
 
   const handleDelete = async (id: string) => {
-    await fetch(`/api/history/${id}`, {
+    await fetch(`${API_URL}/history/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })

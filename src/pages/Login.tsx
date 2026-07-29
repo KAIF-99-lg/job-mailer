@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import API_URL from '../api'
 import { motion } from 'framer-motion'
 import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react'
 
@@ -18,7 +19,7 @@ export default function Login({ onLogin }: LoginProps) {
     setError('')
     setLoading(true)
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

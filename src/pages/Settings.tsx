@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import API_URL from '../api'
 import { motion } from 'framer-motion'
 import { Sun, Moon, Monitor, Save, Check, Loader2 } from 'lucide-react'
 
@@ -27,7 +28,7 @@ export default function Settings({ theme, onThemeChange }: SettingsProps) {
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    fetch('/api/auth/me', {
+    fetch(`${API_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
       .then((r) => r.json())
@@ -51,7 +52,7 @@ export default function Settings({ theme, onThemeChange }: SettingsProps) {
 
   const handleSave = async () => {
     setSaving(true)
-    await fetch('/api/auth/profile', {
+    await fetch(`${API_URL}/auth/profile`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

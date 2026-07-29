@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import API_URL from '../api'
 import { motion } from 'framer-motion'
 import { Mail, TrendingUp, CheckCircle, XCircle, RefreshCw, Clock, ArrowRight, Loader2 } from 'lucide-react'
 
@@ -72,7 +73,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/history/dashboard', {
+    fetch(`${API_URL}/history/dashboard`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
       .then((r) => r.json())

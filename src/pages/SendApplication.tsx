@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
+import API_URL from '../api'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDown,
@@ -69,7 +70,7 @@ export default function SendApplication() {
 
   // Fetch templates
   useEffect(() => {
-    fetch('/api/templates', {
+    fetch(`${API_URL}/templates`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
       .then((r) => r.json())
@@ -144,7 +145,7 @@ export default function SendApplication() {
     setSent(0)
     setSendError('')
     try {
-      const res = await fetch('/api/mail/send', {
+      const res = await fetch(`${API_URL}/mail/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import API_URL from '../api'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, Edit, Zap, X, Plus, Loader2, Save, Trash2 } from 'lucide-react'
 
@@ -21,7 +22,7 @@ export default function Templates() {
 
   const fetchTemplates = () => {
     setLoading(true)
-    fetch('/api/templates', {
+    fetch(`${API_URL}/templates`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
       .then((r) => r.json())
@@ -39,7 +40,7 @@ export default function Templates() {
   const handleSave = async () => {
     if (!editing) return
     setSaving(true)
-    await fetch(`/api/templates/${editing._id}`, {
+    await fetch(`${API_URL}/templates/${editing._id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +55,7 @@ export default function Templates() {
 
   const handleCreate = async () => {
     setSaving(true)
-    await fetch('/api/templates', {
+    await fetch(`${API_URL}/templates`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -69,7 +70,7 @@ export default function Templates() {
   }
 
   const handleDelete = async (id: string) => {
-    await fetch(`/api/templates/${id}`, {
+    await fetch(`${API_URL}/templates/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
