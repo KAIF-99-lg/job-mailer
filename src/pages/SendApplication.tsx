@@ -143,6 +143,11 @@ export default function SendApplication() {
     setSent(0)
     setSendError('')
 
+    const timeoutId = window.setTimeout(() => {
+      setSending(false)
+      setSendError('The request took too long. Please try again.')
+    }, 12000)
+
     try {
       const res = await fetch(`${API_URL}/mail/send`, {
         method: 'POST',
@@ -175,6 +180,7 @@ export default function SendApplication() {
     } catch {
       setSendError('Network error. Please check your connection.')
     } finally {
+      window.clearTimeout(timeoutId)
       setSending(false)
     }
   }
