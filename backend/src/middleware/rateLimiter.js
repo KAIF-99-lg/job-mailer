@@ -9,6 +9,7 @@ const apiLimiter = rateLimit({
   max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true,
   handler: (req, res) => {
     sendError(res, 429, 'Too many requests. Please try again later.');
   },
@@ -22,6 +23,7 @@ const authLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true,
   handler: (req, res) => {
     sendError(res, 429, 'Too many login attempts. Please try again in 15 minutes.');
   },
@@ -35,6 +37,7 @@ const mailLimiter = rateLimit({
   max: 50,
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true,
   handler: (req, res) => {
     sendError(res, 429, 'Email sending limit reached. Please try again in an hour.');
   },
