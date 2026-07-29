@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
 const Template = require('../models/Template');
 const { getProfile } = require('../config/profile');
 const AppError = require('../utils/AppError');
+const logger = require('../utils/logger');
 
 const DEFAULT_TEMPLATES = [
   {
@@ -200,22 +202,32 @@ LeetCode: https://leetcode.com/u/MD_KAIF_99/`,
   },
 ];
 
+const FALLBACK_TEMPLATES = Object.fromEntries(
+  DEFAULT_TEMPLATES.map((template) => [template.roleName, { ...template }])
+);
+
 class TemplateService {
   /**
    * Seed default templates once when the collection is empty.
    */
   async seedDefaultTemplates() {
-    const existingCount = await Template.countDocuments();
-    if (existingCount > 0) return;
+    if (mongoose.connection.readyState !== 1) return;
 
-    const templates = DEFAULT_TEMPLATES.map((t) => ({
-      roleName: t.roleName,
-      subject: t.subject,
-      body: t.body,
-      isDefault: true,
-    }));
+    try {
+      const existingCount = await Template.countDocuments();
+      if (existingCount > 0) return;
 
-    await Template.insertMany(templates, { ordered: false }).catch(() => {});
+      const templates = DEFAULT_TEMPLATES.map((t) => ({
+        roleName: t.roleName,
+        subject: t.subject,
+        body: t.body,
+        isDefault: true,
+      }));
+
+      await Template.insertMany(templates, { ordered: false }).catch(() => {});
+    } catch (error) {
+      logger.warn(`Template seeding skipped: ${error.message}`);
+    }
   }
 
   /**
@@ -223,7 +235,16 @@ class TemplateService {
    * @returns {Promise<Template[]>}
    */
   async getAllForSingleUser() {
-    return Template.find({}).sort({ roleName: 1 }).lean();
+    if (mongoose.connection.readyState !== 1) {
+      return DEFAULT_TEMPLATES.map((template) => ({ ...template }));
+    }
+
+    try {
+      return await Template.find({}).sort({ roleName: 1 }).lean();
+    } catch (error) {
+      logger.warn(`Template fetch failed, using fallback templates: ${error.message}`);
+      return DEFAULT_TEMPLATES.map((template) => ({ ...template }));
+    }
   }
 
   /**
@@ -243,9 +264,28 @@ class TemplateService {
    * @returns {Promise<Template>}
    */
   async getByRole(roleName) {
-    const template = await Template.findOne({ roleName });
-    if (!template) throw new AppError(`No template found for role: ${roleName}`, 404);
-    return template;
+    if (mongoose.connection.readyState !== 1) {
+      const fallback = FALLBACK_TEMPLATES[roleName];
+      if (fallback) return { ...fallback };
+      throw new AppError(`No template found for role: ${roleName}`, 404);
+    }
+
+    try {
+      const template = await Template.findOne({ roleName });
+      if (!template) {
+        const fallback = FALLBACK_TEMPLATES[roleName];
+        if (fallback) return { ...fallback };
+        throw new AppError(`No template found for role: ${roleName}`, 404);
+      }
+      return template;
+    } catch (error) {
+      const fallback = FALLBACK_TEMPLATES[roleName];
+      if (fallback) {
+        logger.warn(`Using fallback template for ${roleName}: ${error.message}`);
+        return { ...fallback };
+      }
+      throw error;
+    }
   }
 
   /**

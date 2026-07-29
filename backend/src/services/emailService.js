@@ -102,24 +102,30 @@ class EmailService {
 
       const { success, error } = await this.sendWithRetry(mailOptions);
 
-      // Save to history
-      const historyEntry = await EmailHistory.create({
-        companyName: company || '',
-        role,
-        hrEmail: recipientEmail,
-        hrName: hrName || '',
-        subject: finalSubject,
-        body: finalBody,
-        status: success ? 'success' : 'failed',
-        errorMessage: error,
-        retryCount: success ? 0 : 1,
-        sentAt: new Date(),
-      });
+      let historyId = null;
+
+      try {
+        const historyEntry = await EmailHistory.create({
+          companyName: company || '',
+          role,
+          hrEmail: recipientEmail,
+          hrName: hrName || '',
+          subject: finalSubject,
+          body: finalBody,
+          status: success ? 'success' : 'failed',
+          errorMessage: error,
+          retryCount: success ? 0 : 1,
+          sentAt: new Date(),
+        });
+        historyId = historyEntry._id;
+      } catch (historyError) {
+        logger.warn(`History save skipped for ${recipientEmail}: ${historyError.message}`);
+      }
 
       results.push({
         email: recipientEmail,
         status: success ? 'success' : 'failed',
-        historyId: historyEntry._id,
+        ...(historyId && { historyId }),
         ...(error && { error }),
       });
 
@@ -128,7 +134,7 @@ class EmailService {
 
       // Delay between emails (skip after last one)
       if (i < hrEmails.length - 1) {
-        await sleep(delayMs);
+        await sleep(Math.max(0, delayMs));
       }
     }
 

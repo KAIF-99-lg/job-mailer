@@ -138,9 +138,11 @@ export default function SendApplication() {
   // Send mail via real API
   const handleSend = async () => {
     setShowConfirm(false)
+    setShowSuccess(false)
     setSending(true)
     setSent(0)
     setSendError('')
+
     try {
       const res = await fetch(`${API_URL}/mail/send`, {
         method: 'POST',
@@ -155,17 +157,24 @@ export default function SendApplication() {
           subject,
         }),
       })
-      const data = await res.json()
-      if (!res.ok || !data.success) {
-        setSendError(data.message || 'Failed to send emails. Please try again.')
-        setSending(false)
+
+      let data: { success?: boolean; message?: string; data?: { successCount?: number } } | null = null
+      try {
+        data = await res.json()
+      } catch {
+        data = null
+      }
+
+      if (!res.ok || !data?.success) {
+        setSendError(data?.message || 'Failed to send emails. Please try again.')
         return
       }
-      setSent(data.data.successCount)
-      setSending(false)
+
+      setSent(data?.data?.successCount ?? 0)
       setShowSuccess(true)
     } catch {
       setSendError('Network error. Please check your connection.')
+    } finally {
       setSending(false)
     }
   }
