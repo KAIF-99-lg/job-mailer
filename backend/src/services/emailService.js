@@ -31,6 +31,7 @@ class EmailService {
       linkedin: profile.linkedin || '',
       github: profile.github || '',
       leetcode: profile.leetcode || '',
+      portfolio: profile.portfolio || '',
     };
 
     return replaceTemplateVariables(bodyTemplate, variables);

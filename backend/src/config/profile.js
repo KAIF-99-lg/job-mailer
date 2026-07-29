@@ -2,8 +2,8 @@ const path = require('path');
 
 const profile = {
   name: 'Md Kaif',
-  email: 'mdkaif14@gmail.com',
-  phone: '+91 00000 00000',
+  email: 'mdkaif8100@gmaiil.com',
+  phone: '+91 7439566547',
   linkedin: 'https://www.linkedin.com/in/md-kaif-964567251/',
   github: 'https://github.com/KAIF-99-lg',
   portfolio: 'https://project-management-app-theta-five.vercel.app/',
