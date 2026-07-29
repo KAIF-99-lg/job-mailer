@@ -8,11 +8,8 @@ const {
   updateTemplate,
   deleteTemplate,
 } = require('../controllers/templateController');
-const { protect } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { createTemplateValidator, updateTemplateValidator } = require('../validators/templateValidator');
-
-
 
 router.get('/', getAllTemplates);
 router.get('/:id', getTemplateById);

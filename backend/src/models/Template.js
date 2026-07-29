@@ -7,6 +7,7 @@ const templateSchema = new mongoose.Schema(
       required: [true, 'Role name is required.'],
       trim: true,
       maxlength: [100, 'Role name cannot exceed 100 characters.'],
+      unique: true,
     },
     subject: {
       type: String,
@@ -18,11 +19,6 @@ const templateSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Email body is required.'],
     },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
     isDefault: {
       type: Boolean,
       default: false,
@@ -32,8 +28,5 @@ const templateSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-// Compound index: one template per role per user
-templateSchema.index({ roleName: 1, createdBy: 1 }, { unique: true });
 
 module.exports = mongoose.model('Template', templateSchema);

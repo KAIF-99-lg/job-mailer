@@ -40,9 +40,7 @@ export default function History() {
       ...(search && { search }),
       ...(filterStatus !== 'all' && { status: filterStatus }),
     })
-    fetch(`${API_URL}/history?${params}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    })
+    fetch(`${API_URL}/history?${params}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -68,7 +66,6 @@ export default function History() {
     setRetrying(id)
     await fetch(`${API_URL}/history/retry/${id}`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
     setRetrying(null)
     fetchHistory()
@@ -77,7 +74,6 @@ export default function History() {
   const handleDelete = async (id: string) => {
     await fetch(`${API_URL}/history/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
     fetchHistory()
   }

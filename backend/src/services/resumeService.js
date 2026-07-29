@@ -7,20 +7,18 @@ const logger = require('../utils/logger');
 
 class ResumeService {
   /**
-   * Save resume metadata and delete old file if exists.
+   * Save resume metadata and delete the previous file if it exists.
    * @param {object} file - Multer file object
-   * @param {string} userId
    * @returns {Promise<Resume>}
    */
-  async uploadResume(file, userId) {
+  async uploadResume(file) {
     const uniqueSuffix = crypto.randomBytes(8).toString('hex');
     const ext = path.extname(file.originalname).toLowerCase();
-    const fileName = `resume_${userId}_${uniqueSuffix}${ext}`;
+    const fileName = `resume_${uniqueSuffix}${ext}`;
     const filePath = path.join(__dirname, '../../uploads', fileName);
 
-    // Write buffer to disk + delete old record in parallel
     const [existing] = await Promise.all([
-      Resume.findOne({ userId }),
+      Resume.findOne({}),
       fs.promises.writeFile(filePath, file.buffer),
     ]);
 
@@ -30,7 +28,6 @@ class ResumeService {
     }
 
     const resume = await Resume.create({
-      userId,
       originalName: file.originalname,
       fileName,
       fileSize: file.size,
@@ -42,22 +39,20 @@ class ResumeService {
   }
 
   /**
-   * Get active resume for a user.
-   * @param {string} userId
+   * Get the active resume.
    * @returns {Promise<Resume>}
    */
-  async getResume(userId) {
-    const resume = await Resume.findOne({ userId }).lean();
+  async getResume() {
+    const resume = await Resume.findOne({}).lean();
     if (!resume) throw new AppError('No resume found. Please upload your resume.', 404);
     return resume;
   }
 
   /**
    * Delete resume file and DB record.
-   * @param {string} userId
    */
-  async deleteResume(userId) {
-    const resume = await Resume.findOne({ userId });
+  async deleteResume() {
+    const resume = await Resume.findOne({});
     if (!resume) throw new AppError('No resume found.', 404);
     this._deleteFile(resume.path);
     await resume.deleteOne();

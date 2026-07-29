@@ -12,9 +12,6 @@ import Projects from './pages/Projects'
 type Page = 'dashboard' | 'send' | 'templates' | 'history' | 'settings' | 'projects'
 type Theme = 'light' | 'dark' | 'system'
 
-// Kaif's JWT token — valid for 1 year
-const KAIF_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjhmNzhiMDY0YzAxNGIzYTlmMjRhMyIsImlhdCI6MTc4NTI2NDI2NiwiZXhwIjoxODE2ODAwMjY2fQ.aFUn2LHtBJZM5rTpUgyUUjw1-r_fPSGRHYgoY6_rW1g'
-
 function resolveTheme(theme: Theme): 'light' | 'dark' {
   if (theme === 'system') {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -59,11 +56,6 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>('system')
   const [collapsed, setCollapsed] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
-
-  // Auto-set token on load
-  useEffect(() => {
-    localStorage.setItem('token', KAIF_TOKEN)
-  }, [])
 
   useEffect(() => {
     const root = document.documentElement

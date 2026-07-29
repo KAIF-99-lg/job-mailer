@@ -73,9 +73,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`${API_URL}/history/dashboard`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    })
+    fetch(`${API_URL}/history/dashboard`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success) setStats(data.data)

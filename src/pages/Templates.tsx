@@ -22,9 +22,7 @@ export default function Templates() {
 
   const fetchTemplates = () => {
     setLoading(true)
-    fetch(`${API_URL}/templates`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    })
+    fetch(`${API_URL}/templates`)
       .then((r) => r.json())
       .then((data) => { if (data.success) setTemplates(data.data.templates) })
       .finally(() => setLoading(false))
@@ -44,7 +42,6 @@ export default function Templates() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(editForm),
     })
@@ -59,7 +56,6 @@ export default function Templates() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(editForm),
     })
@@ -72,7 +68,6 @@ export default function Templates() {
   const handleDelete = async (id: string) => {
     await fetch(`${API_URL}/templates/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
     fetchTemplates()
   }

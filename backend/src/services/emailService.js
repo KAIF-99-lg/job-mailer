@@ -106,7 +106,6 @@ class EmailService {
 
       // Save to history
       const historyEntry = await EmailHistory.create({
-        userId: user._id,
         companyName: company || '',
         role,
         hrEmail: recipientEmail,

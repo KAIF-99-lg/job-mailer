@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import API_URL from '../api'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sun, Moon, Monitor, Save, Check, Loader2 } from 'lucide-react'
 
@@ -20,55 +19,32 @@ interface UserProfile {
 }
 
 export default function Settings({ theme, onThemeChange }: SettingsProps) {
-  const [profile, setProfile] = useState<UserProfile>({
-    name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', signature: '', preferredDelay: 5000,
+  const [profile, setProfile] = useState<UserProfile>(() => {
+    if (typeof window === 'undefined') {
+      return {
+        name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', signature: '', preferredDelay: 5000,
+      }
+    }
+
+    try {
+      const stored = localStorage.getItem('jobmailer-profile')
+      if (stored) {
+        return JSON.parse(stored)
+      }
+    } catch {
+      // Ignore invalid stored profile
+    }
+
+    return {
+      name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', signature: '', preferredDelay: 5000,
+    }
   })
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  useEffect(() => {
-    fetch(`${API_URL}/auth/me`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success) {
-          const u = data.data.user
-          setProfile({
-            name: u.name || '',
-            email: u.email || '',
-            phone: u.phone || '',
-            linkedin: u.linkedin || '',
-            github: u.github || '',
-            leetcode: u.leetcode || '',
-            signature: u.signature || '',
-            preferredDelay: u.preferredDelay || 5000,
-          })
-        }
-      })
-      .finally(() => setLoading(false))
-  }, [])
-
   const handleSave = async () => {
     setSaving(true)
-    await fetch(`${API_URL}/auth/profile`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify({
-        name: profile.name,
-        phone: profile.phone,
-        linkedin: profile.linkedin,
-        github: profile.github,
-        leetcode: profile.leetcode,
-        signature: profile.signature,
-        preferredDelay: profile.preferredDelay,
-        theme,
-      }),
-    })
+    localStorage.setItem('jobmailer-profile', JSON.stringify(profile))
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -81,14 +57,6 @@ export default function Settings({ theme, onThemeChange }: SettingsProps) {
   const headClass = 'px-5 py-3.5 border-b border-[var(--color-border)] bg-[var(--color-muted)]/40'
   const bodyClass = 'px-5 py-5'
   const inputClass = 'w-full px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] text-[13px] text-[var(--color-foreground)] placeholder-[var(--color-muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all'
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full p-6">
-        <Loader2 size={22} className="animate-spin text-[var(--color-muted-foreground)]" />
-      </div>
-    )
-  }
 
   const initials = profile.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2) || '?'
 

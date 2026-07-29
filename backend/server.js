@@ -3,6 +3,7 @@ const app = require('./app');
 const connectDB = require('./src/config/database');
 const { verifyTransporter } = require('./src/config/mailer');
 const logger = require('./src/utils/logger');
+const templateService = require('./src/services/templateService');
 
 const PORT = process.env.PORT || 5000;
 
@@ -11,6 +12,9 @@ let server;
 const startServer = async () => {
   // Connect to MongoDB
   await connectDB();
+
+  // Seed default templates once when the collection is empty
+  await templateService.seedDefaultTemplates();
 
   // Verify email transporter (non-blocking)
   verifyTransporter();

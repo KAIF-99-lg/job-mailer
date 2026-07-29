@@ -13,7 +13,6 @@ const AppError = require('./src/utils/AppError');
 const logger = require('./src/utils/logger');
 
 // Routes
-const authRoutes = require('./src/routes/authRoutes');
 const mailRoutes = require('./src/routes/mailRoutes');
 const templateRoutes = require('./src/routes/templateRoutes');
 const historyRoutes = require('./src/routes/historyRoutes');
@@ -28,7 +27,7 @@ app.use(
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type'],
   })
 );
 
@@ -59,7 +58,6 @@ app.get('/health', (req, res) => {
 });
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
 app.use('/api/mail', mailRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/history', historyRoutes);

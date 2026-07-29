@@ -70,9 +70,7 @@ export default function SendApplication() {
 
   // Fetch templates
   useEffect(() => {
-    fetch(`${API_URL}/templates`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    })
+    fetch(`${API_URL}/templates`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -109,7 +107,6 @@ export default function SendApplication() {
     try {
       const res = await fetch('/api/resume/upload', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         body: formData,
       })
       const data = await res.json()
@@ -149,7 +146,6 @@ export default function SendApplication() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           role,

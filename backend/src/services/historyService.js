@@ -3,16 +3,15 @@ const AppError = require('../utils/AppError');
 
 class HistoryService {
   /**
-   * Get paginated email history for a user with optional filters.
-   * @param {string} userId
+   * Get paginated email history with optional filters.
    * @param {object} query - { page, limit, status, search, role }
    * @returns {Promise<{records: object[], total: number, page: number, totalPages: number}>}
    */
-  async getHistory(userId, query = {}) {
+  async getHistory(query = {}) {
     const { page = 1, limit = 20, status, search, role } = query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const filter = { userId };
+    const filter = {};
     if (status && ['success', 'failed'].includes(status)) filter.status = status;
     if (role) filter.role = { $regex: role, $options: 'i' };
     if (search) {
@@ -41,13 +40,12 @@ class HistoryService {
   }
 
   /**
-   * Get a single history entry by ID, ensuring ownership.
+   * Get a single history entry by ID.
    * @param {string} historyId
-   * @param {string} userId
    * @returns {Promise<EmailHistory>}
    */
-  async getById(historyId, userId) {
-    const entry = await EmailHistory.findOne({ _id: historyId, userId });
+  async getById(historyId) {
+    const entry = await EmailHistory.findById(historyId);
     if (!entry) throw new AppError('History entry not found.', 404);
     return entry;
   }
@@ -55,25 +53,22 @@ class HistoryService {
   /**
    * Delete a history entry.
    * @param {string} historyId
-   * @param {string} userId
    */
-  async delete(historyId, userId) {
-    const entry = await EmailHistory.findOneAndDelete({ _id: historyId, userId });
+  async delete(historyId) {
+    const entry = await EmailHistory.findByIdAndDelete(historyId);
     if (!entry) throw new AppError('History entry not found.', 404);
   }
 
   /**
-   * Get dashboard statistics for a user.
-   * @param {string} userId
+   * Get dashboard statistics.
    * @returns {Promise<object>}
    */
-  async getDashboardStats(userId) {
+  async getDashboardStats() {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
     const [totalStats, todayStats, recentActivity] = await Promise.all([
       EmailHistory.aggregate([
-        { $match: { userId } },
         {
           $group: {
             _id: null,
@@ -84,7 +79,7 @@ class HistoryService {
         },
       ]),
       EmailHistory.aggregate([
-        { $match: { userId, sentAt: { $gte: todayStart } } },
+        { $match: { sentAt: { $gte: todayStart } } },
         {
           $group: {
             _id: null,
@@ -93,7 +88,7 @@ class HistoryService {
           },
         },
       ]),
-      EmailHistory.find({ userId })
+      EmailHistory.find({})
         .sort({ sentAt: -1 })
         .limit(20)
         .select('companyName role hrEmail status sentAt')

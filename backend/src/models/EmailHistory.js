@@ -2,12 +2,6 @@ const mongoose = require('mongoose');
 
 const emailHistorySchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: true,
-    },
     companyName: {
       type: String,
       trim: true,
@@ -61,8 +55,7 @@ const emailHistorySchema = new mongoose.Schema(
   }
 );
 
-// Indexes for efficient querying
-emailHistorySchema.index({ userId: 1, sentAt: -1 });
-emailHistorySchema.index({ userId: 1, status: 1 });
+emailHistorySchema.index({ sentAt: -1 });
+emailHistorySchema.index({ status: 1 });
 
 module.exports = mongoose.model('EmailHistory', emailHistorySchema);

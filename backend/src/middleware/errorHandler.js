@@ -24,12 +24,6 @@ const handleValidationError = (err) => {
 };
 
 /**
- * Handle JWT errors.
- */
-const handleJWTError = () => ({ message: 'Invalid token. Please log in again.', statusCode: 401 });
-const handleJWTExpiredError = () => ({ message: 'Token expired. Please log in again.', statusCode: 401 });
-
-/**
  * Centralized error middleware — must be registered last in app.js.
  */
 const errorHandler = (err, req, res, next) => {
@@ -40,8 +34,6 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'CastError') ({ message, statusCode } = handleCastError(err));
   if (err.code === 11000) ({ message, statusCode } = handleDuplicateKeyError(err));
   if (err.name === 'ValidationError') ({ message, statusCode } = handleValidationError(err));
-  if (err.name === 'JsonWebTokenError') ({ message, statusCode } = handleJWTError());
-  if (err.name === 'TokenExpiredError') ({ message, statusCode } = handleJWTExpiredError());
 
   // Log server errors
   if (statusCode >= 500) {
