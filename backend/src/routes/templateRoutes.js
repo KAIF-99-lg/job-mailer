@@ -12,7 +12,7 @@ const { protect } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { createTemplateValidator, updateTemplateValidator } = require('../validators/templateValidator');
 
-router.use(protect);
+
 
 router.get('/', getAllTemplates);
 router.get('/:id', getTemplateById);
