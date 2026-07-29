@@ -8,6 +8,7 @@ import Templates from './pages/Templates'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import Projects from './pages/Projects'
+import { LayoutDashboard, Send, FileText, History as HistoryIcon, Settings as SettingsIcon } from 'lucide-react'
 
 type Page = 'dashboard' | 'send' | 'templates' | 'history' | 'settings' | 'projects'
 type Theme = 'light' | 'dark' | 'system'
@@ -55,6 +56,8 @@ export default function App() {
   const [page, setPage] = useState<Page>('dashboard')
   const [theme, setTheme] = useState<Theme>('system')
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
 
   useEffect(() => {
@@ -66,8 +69,10 @@ export default function App() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) setCollapsed(true)
-      else setCollapsed(false)
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      if (mobile) setCollapsed(true)
+      else { setCollapsed(false); setMobileOpen(false) }
     }
     handleResize()
     window.addEventListener('resize', handleResize)
@@ -85,19 +90,44 @@ export default function App() {
     }
   }
 
+  const handleNavigate = (p: Page) => {
+    setPage(p)
+    setMobileOpen(false)
+  }
+
+  const bottomNav = [
+    { id: 'dashboard' as Page, label: 'Home', icon: LayoutDashboard },
+    { id: 'send' as Page, label: 'Send', icon: Send },
+    { id: 'templates' as Page, label: 'Templates', icon: FileText },
+    { id: 'history' as Page, label: 'History', icon: HistoryIcon },
+    { id: 'settings' as Page, label: 'Settings', icon: SettingsIcon },
+  ]
+
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--color-background)]" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <Sidebar currentPage={page} onNavigate={setPage} collapsed={collapsed} />
+      {/* Mobile overlay */}
+      {isMobile && mobileOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setMobileOpen(false)} />
+      )}
+
+      {/* Sidebar — hidden on mobile unless mobileOpen */}
+      <div className={`${
+        isMobile
+          ? `fixed inset-y-0 left-0 z-50 transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`
+          : 'relative'
+      }`}>
+        <Sidebar currentPage={page} onNavigate={handleNavigate} collapsed={isMobile ? false : collapsed} />
+      </div>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Navbar
           theme={theme}
           onThemeChange={setTheme}
           sidebarCollapsed={collapsed}
-          onToggleSidebar={() => setCollapsed((c) => !c)}
+          onToggleSidebar={() => isMobile ? setMobileOpen((o) => !o) : setCollapsed((c) => !c)}
         />
 
-        <main className="flex-1 overflow-y-auto bg-[var(--color-background)]">
+        <main className={`flex-1 overflow-y-auto bg-[var(--color-background)] ${isMobile ? 'pb-16' : ''}`}>
           <AnimatePresence mode="wait">
             <motion.div
               key={page}
@@ -111,6 +141,25 @@ export default function App() {
             </motion.div>
           </AnimatePresence>
         </main>
+
+        {/* Mobile bottom nav */}
+        {isMobile && (
+          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-[var(--color-card)] border-t border-[var(--color-border)] flex items-center z-30">
+            {bottomNav.map(({ id, label, icon: Icon }) => {
+              const active = page === id
+              return (
+                <button
+                  key={id}
+                  onClick={() => handleNavigate(id)}
+                  className="flex-1 flex flex-col items-center justify-center gap-1 py-2"
+                >
+                  <Icon size={20} strokeWidth={active ? 2.2 : 1.8} className={active ? 'text-[#2563EB]' : 'text-[var(--color-muted-foreground)]'} />
+                  <span className={`text-[10px] font-medium ${active ? 'text-[#2563EB]' : 'text-[var(--color-muted-foreground)]'}`}>{label}</span>
+                </button>
+              )
+            })}
+          </nav>
+        )}
       </div>
 
       <AnimatePresence>

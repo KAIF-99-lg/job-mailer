@@ -84,7 +84,7 @@ export default function Templates() {
   ]
 
   return (
-    <div className="p-6 max-w-6xl">
+    <div className="p-4 md:p-6 max-w-6xl">
       <div className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-[18px] font-semibold text-[var(--color-foreground)] tracking-tight">Templates</h1>

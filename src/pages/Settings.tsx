@@ -44,7 +44,7 @@ export default function Settings({ theme, onThemeChange }: SettingsProps) {
   const initials = profile.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2) || '?'
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-4 md:p-6 max-w-2xl">
       <div className="mb-6">
         <h1 className="text-[18px] font-semibold text-[var(--color-foreground)] tracking-tight">Settings</h1>
         <p className="text-[13px] text-[var(--color-muted-foreground)] mt-0.5">Manage your account and preferences</p>
@@ -65,7 +65,7 @@ export default function Settings({ theme, onThemeChange }: SettingsProps) {
               <p className="text-[12.5px] text-[var(--color-muted-foreground)]">{profile.email}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[11.5px] font-medium text-[var(--color-muted-foreground)] mb-1.5">Full Name</label>
               <input value={profile.name} onChange={set('name')} placeholder="Your full name" className={inputClass} />

@@ -99,7 +99,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl">
+    <div className="p-4 md:p-6 space-y-6 max-w-6xl">
       {/* Hero card */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -140,7 +140,7 @@ export default function Dashboard() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
       >
         {cards.map((card) => {
           const Icon = card.icon

@@ -29,7 +29,7 @@ export default function Navbar({ theme, onThemeChange, sidebarCollapsed, onToggl
       </button>
 
       {/* Search */}
-      <div className="flex-1 max-w-xs">
+      <div className="hidden sm:flex flex-1 max-w-xs">
         <div className="relative">
           <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-muted-foreground)]" />
           <input

@@ -221,7 +221,7 @@ export default function SendApplication() {
   }
 
   return (
-    <div className="p-6 max-w-3xl space-y-4">
+    <div className="p-4 md:p-6 max-w-3xl space-y-4">
       <div className="mb-2">
         <h1 className="text-[18px] font-semibold text-[var(--color-foreground)] tracking-tight">Send Application</h1>
         <p className="text-[13px] text-[var(--color-muted-foreground)] mt-0.5">Compose and send professional job applications</p>

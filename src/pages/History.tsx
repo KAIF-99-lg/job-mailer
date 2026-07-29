@@ -79,7 +79,7 @@ export default function History() {
   }
 
   return (
-    <div className="p-6 max-w-6xl">
+    <div className="p-4 md:p-6 max-w-6xl">
       <div className="flex items-start justify-between mb-5 gap-4 flex-wrap">
         <div>
           <h1 className="text-[18px] font-semibold text-[var(--color-foreground)] tracking-tight">History</h1>
@@ -124,7 +124,7 @@ export default function History() {
           </div>
         ) : records.length > 0 ? (
           <>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-4 md:mx-0">
               <table className="w-full">
                 <thead>
                   <tr className="border-t border-[var(--color-border)] bg-[var(--color-muted)]/50">
