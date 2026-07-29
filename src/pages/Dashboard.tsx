@@ -68,7 +68,7 @@ function timeAgo(dateStr: string) {
   return `${Math.floor(hrs / 24)} day${Math.floor(hrs / 24) > 1 ? 's' : ''} ago`
 }
 
-export default function Dashboard() {
+export default function Dashboard({ onNavigate }: { onNavigate: (page: 'send') => void }) {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -123,7 +123,7 @@ export default function Dashboard() {
                 ? `You've sent ${stats.totalEmails} applications with a ${stats.successPercentage}% success rate.`
                 : 'Start sending professional job applications today.'}
             </p>
-            <button className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2563EB] text-white text-[13px] font-medium hover:bg-[#1D4ED8] transition-colors">
+            <button onClick={() => onNavigate('send')} className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2563EB] text-white text-[13px] font-medium hover:bg-[#1D4ED8] transition-colors">
               Send Applications <ArrowRight size={13} />
             </button>
           </div>

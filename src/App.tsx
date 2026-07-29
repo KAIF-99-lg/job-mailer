@@ -81,7 +81,7 @@ export default function App() {
 
   const renderPage = () => {
     switch (page) {
-      case 'dashboard': return <Dashboard />
+      case 'dashboard': return <Dashboard onNavigate={setPage} />
       case 'send': return <SendApplication />
       case 'templates': return <Templates />
       case 'history': return <History />
