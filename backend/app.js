@@ -24,19 +24,26 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://job-mailer-ashen.vercel.app',
   'https://job-mailer-1ltsgi8sb-md-kaifs-projects-50b46c98.vercel.app',
+  'https://job-mailer-9syhskwpd-md-kaifs-projects-50b46c98.vercel.app',
   process.env.CLIENT_URL,
 ].filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  return /https:\/\/([a-z0-9-]+\.)*vercel\.app$/i.test(origin);
+};
 
 // ─── Security Middleware ───────────────────────────────────────────────────────
 app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true)
-        return
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+        return;
       }
-      callback(null, false)
+      callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
