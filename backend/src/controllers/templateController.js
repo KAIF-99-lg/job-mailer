@@ -3,7 +3,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { sendSuccess } = require('../utils/apiResponse');
 
 const getAllTemplates = asyncHandler(async (req, res) => {
-  const templates = await templateService.getAllByUser();
+  const templates = await templateService.getAllForSingleUser();
   sendSuccess(res, 200, 'Templates fetched.', { templates });
 });
 

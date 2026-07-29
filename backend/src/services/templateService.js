@@ -1,4 +1,5 @@
 const Template = require('../models/Template');
+const { getProfile } = require('../config/profile');
 const AppError = require('../utils/AppError');
 
 const DEFAULT_TEMPLATES = [
@@ -221,7 +222,7 @@ class TemplateService {
    * Get all templates.
    * @returns {Promise<Template[]>}
    */
-  async getAllByUser() {
+  async getAllForSingleUser() {
     return Template.find({}).sort({ roleName: 1 }).lean();
   }
 

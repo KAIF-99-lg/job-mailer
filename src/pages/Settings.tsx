@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sun, Moon, Monitor, Save, Check, Loader2 } from 'lucide-react'
+import { getProfile } from '../profile'
 
 interface SettingsProps {
   theme: 'light' | 'dark' | 'system'
@@ -14,31 +15,13 @@ interface UserProfile {
   linkedin: string
   github: string
   leetcode: string
+  portfolio: string
   signature: string
   preferredDelay: number
 }
 
 export default function Settings({ theme, onThemeChange }: SettingsProps) {
-  const [profile, setProfile] = useState<UserProfile>(() => {
-    if (typeof window === 'undefined') {
-      return {
-        name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', signature: '', preferredDelay: 5000,
-      }
-    }
-
-    try {
-      const stored = localStorage.getItem('jobmailer-profile')
-      if (stored) {
-        return JSON.parse(stored)
-      }
-    } catch {
-      // Ignore invalid stored profile
-    }
-
-    return {
-      name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', signature: '', preferredDelay: 5000,
-    }
-  })
+  const [profile, setProfile] = useState<UserProfile>(() => ({ ...getProfile() }))
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -98,6 +81,10 @@ export default function Settings({ theme, onThemeChange }: SettingsProps) {
             <div>
               <label className="block text-[11.5px] font-medium text-[var(--color-muted-foreground)] mb-1.5">GitHub</label>
               <input value={profile.github} onChange={set('github')} placeholder="github.com/yourusername" className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-[11.5px] font-medium text-[var(--color-muted-foreground)] mb-1.5">Portfolio</label>
+              <input value={profile.portfolio} onChange={set('portfolio')} placeholder="https://yourportfolio.com" className={inputClass} />
             </div>
             <div>
               <label className="block text-[11.5px] font-medium text-[var(--color-muted-foreground)] mb-1.5">LeetCode</label>

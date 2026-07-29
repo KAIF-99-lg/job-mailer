@@ -19,15 +19,28 @@ const historyRoutes = require('./src/routes/historyRoutes');
 const resumeRoutes = require('./src/routes/resumeRoutes');
 
 const app = express();
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://job-mailer-ashen.vercel.app',
+  'https://job-mailer-1ltsgi8sb-md-kaifs-projects-50b46c98.vercel.app',
+  process.env.CLIENT_URL,
+].filter(Boolean);
 
 // ─── Security Middleware ───────────────────────────────────────────────────────
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+        return
+      }
+      callback(null, false)
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 

@@ -1,12 +1,7 @@
-const path = require('path');
 const { createTransporter } = require('../config/mailer');
+const { getProfile } = require('../config/profile');
 const EmailHistory = require('../models/EmailHistory');
-const Resume = require('../models/Resume');
-
-const HARDCODED_RESUME_PATH = path.resolve(__dirname, '../../../KAIF_RESUME.pdf');
-const HARDCODED_RESUME_NAME = 'KAIF_RESUME.pdf';
 const { generateGreeting, replaceTemplateVariables, generateSubject, sleep } = require('../utils/templateHelpers');
-const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
 
 class EmailService {
@@ -21,7 +16,8 @@ class EmailService {
    * @returns {string}
    */
   buildEmailBody(bodyTemplate, params) {
-    const { hrName, company, role, user } = params;
+    const { hrName, company, role } = params;
+    const profile = getProfile();
     const greeting = generateGreeting(hrName, company);
 
     const variables = {
@@ -29,12 +25,12 @@ class EmailService {
       hrName: hrName || '',
       company: company || '',
       role: role || '',
-      candidateName: user.name || '',
-      phone: user.phone || '',
-      email: user.email || '',
-      linkedin: user.linkedin || '',
-      github: user.github || '',
-      leetcode: user.leetcode || '',
+      candidateName: profile.name || '',
+      phone: profile.phone || '',
+      email: profile.email || '',
+      linkedin: profile.linkedin || '',
+      github: profile.github || '',
+      leetcode: profile.leetcode || '',
     };
 
     return replaceTemplateVariables(bodyTemplate, variables);
@@ -77,10 +73,11 @@ class EmailService {
    * @returns {Promise<{results: object[], successCount: number, failedCount: number}>}
    */
   async sendBulk(params) {
-    const { hrEmails, role, company, hrName, subject, bodyTemplate, user, delayMs } = params;
+    const { hrEmails, role, company, hrName, subject, bodyTemplate, delayMs } = params;
+    const profile = getProfile();
 
-    const finalBody = this.buildEmailBody(bodyTemplate, { hrName, company, role, user });
-    const finalSubject = generateSubject(role, user.name, subject);
+    const finalBody = this.buildEmailBody(bodyTemplate, { hrName, company, role });
+    const finalSubject = generateSubject(role, profile.name, subject);
 
     const results = [];
     let successCount = 0;
@@ -90,14 +87,14 @@ class EmailService {
       const recipientEmail = hrEmails[i];
 
       const mailOptions = {
-        from: `"${user.name}" <${process.env.EMAIL_USER}>`,
+        from: `"${profile.name}" <${process.env.EMAIL_USER}>`,
         to: recipientEmail,
         subject: finalSubject,
         text: finalBody,
         attachments: [
           {
-            filename: HARDCODED_RESUME_NAME,
-            path: HARDCODED_RESUME_PATH,
+            filename: profile.resumeFileName,
+            path: profile.resumePath,
           },
         ],
       };
@@ -143,16 +140,17 @@ class EmailService {
    * @param {object} user - User document
    * @returns {Promise<object>}
    */
-  async retryFromHistory(historyEntry, user) {
+  async retryFromHistory(historyEntry) {
+    const profile = getProfile();
     const mailOptions = {
-      from: `"${user.name}" <${process.env.EMAIL_USER}>`,
+      from: `"${profile.name}" <${process.env.EMAIL_USER}>`,
       to: historyEntry.hrEmail,
       subject: historyEntry.subject,
       text: historyEntry.body,
       attachments: [
         {
-          filename: HARDCODED_RESUME_NAME,
-          path: HARDCODED_RESUME_PATH,
+          filename: profile.resumeFileName,
+          path: profile.resumePath,
         },
       ],
     };
