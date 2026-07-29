@@ -105,7 +105,7 @@ export default function SendApplication() {
     const formData = new FormData()
     formData.append('resume', file)
     try {
-      const res = await fetch('/api/resume/upload', {
+      const res = await fetch(`${API_URL}/resume/upload`, {
         method: 'POST',
         body: formData,
       })
