@@ -43,17 +43,12 @@ class EmailService {
    * @param {number} retryCount - Current retry attempt
    * @returns {Promise<{success: boolean, error: string|null}>}
    */
-  async sendWithRetry(mailOptions, retryCount = 0) {
+  async sendWithRetry(mailOptions) {
     try {
       await this.transporter.sendMail(mailOptions);
       return { success: true, error: null };
     } catch (error) {
-      if (retryCount < 1) {
-        logger.warn(`Email send failed. Retrying... (${error.message})`);
-        await sleep(2000);
-        return this.sendWithRetry(mailOptions, retryCount + 1);
-      }
-      logger.error(`Email send failed after retry: ${error.message}`);
+      logger.error(`Email send failed: ${error.message}`);
       return { success: false, error: error.message };
     }
   }

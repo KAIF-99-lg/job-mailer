@@ -11,7 +11,7 @@ const sendMail = asyncHandler(async (req, res) => {
   const { role, hrEmails, companyName, hrName, subject, preferredDelay } = req.body;
 
   const template = await templateService.getByRole(role);
-  const delayMs = preferredDelay ?? 1000;
+  const delayMs = preferredDelay ?? 0;
 
   const { results, successCount, failedCount } = await emailService.sendBulk({
     hrEmails,
