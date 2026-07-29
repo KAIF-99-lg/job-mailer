@@ -1,0 +1,10 @@
+{
+  "description": "Streamline your job application process with a professional platform that allows users to send tailored applications and track their success efficiently.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

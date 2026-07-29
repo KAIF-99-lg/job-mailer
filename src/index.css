@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme inline {
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  --color-background: #F8FAFC;
+  --color-foreground: #111827;
+  --color-card: #ffffff;
+  --color-card-foreground: #111827;
+  --color-primary: #2563EB;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #F1F5F9;
+  --color-secondary-foreground: #374151;
+  --color-muted: #F1F5F9;
+  --color-muted-foreground: #6B7280;
+  --color-accent: #EFF6FF;
+  --color-accent-foreground: #1D4ED8;
+  --color-border: #E5E7EB;
+  --color-ring: #2563EB;
+  --color-success: #22C55E;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #374151;
+  --color-sidebar-active: #EFF6FF;
+  --color-sidebar-active-foreground: #2563EB;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #F8FAFC;
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark body {
+  background-color: #0F1117;
+  color: #F9FAFB;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 99px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #374151;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-background: #0F1117;
+  --color-foreground: #F9FAFB;
+  --color-card: #1A1D27;
+  --color-card-foreground: #F9FAFB;
+  --color-secondary: #1E2130;
+  --color-secondary-foreground: #D1D5DB;
+  --color-muted: #1E2130;
+  --color-muted-foreground: #9CA3AF;
+  --color-accent: #1E2D4E;
+  --color-accent-foreground: #93C5FD;
+  --color-border: #2D3141;
+  --color-sidebar: #13161F;
+  --color-sidebar-foreground: #D1D5DB;
+  --color-sidebar-active: #1E2D4E;
+  --color-sidebar-active-foreground: #93C5FD;
+}
