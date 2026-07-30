@@ -156,7 +156,7 @@ export default function SendApplication() {
     const timeoutId = window.setTimeout(() => {
       setSending(false)
       setSendError('The request took too long. Please try again.')
-    }, 12000)
+    }, 60000)
 
     try {
       const res = await fetch(`${API_URL}/mail/send`, {
