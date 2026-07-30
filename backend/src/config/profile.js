@@ -2,7 +2,7 @@ const path = require('path');
 
 const profile = {
   name: 'Md Kaif',
-  email: 'mdkaif8100@gmaiil.com',
+  email: 'mdkaif8100@gmail.com',
   phone: '+91 7439566547',
   linkedin: 'https://www.linkedin.com/in/md-kaif-964567251/',
   github: 'https://github.com/KAIF-99-lg',
