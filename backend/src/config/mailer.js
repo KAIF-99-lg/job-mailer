@@ -1,40 +1,16 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const logger = require('../utils/logger');
 
-let transporter = null;
+let resendClient = null;
 
 const createTransporter = () => {
-  if (transporter) return transporter;
-
-  transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    family: 4,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 100,
-    rateLimit: 10,
-  });
-
-  return transporter;
+  if (resendClient) return resendClient;
+  resendClient = new Resend(process.env.RESEND_API_KEY);
+  return resendClient;
 };
 
 const verifyTransporter = async () => {
-  try {
-    const t = createTransporter();
-    await t.verify();
-    logger.info('Email transporter verified successfully.');
-  } catch (error) {
-    logger.error(`Email transporter verification failed: ${error.message}`);
-  }
+  logger.info('Resend email client initialized.');
 };
 
 module.exports = { createTransporter, verifyTransporter };

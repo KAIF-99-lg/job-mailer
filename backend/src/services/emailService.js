@@ -35,7 +35,18 @@ class EmailService {
 
   async sendWithRetry(mailOptions) {
     try {
-      await this.transporter.sendMail(mailOptions);
+      const resend = createTransporter();
+      const { error } = await resend.emails.send({
+        from: mailOptions.from,
+        to: mailOptions.to,
+        subject: mailOptions.subject,
+        text: mailOptions.text,
+        attachments: mailOptions.attachments.map(a => ({
+          filename: a.filename,
+          content: a.content,
+        })),
+      });
+      if (error) return { success: false, error: error.message };
       return { success: true, error: null };
     } catch (error) {
       logger.error(`Email send failed: ${error.message}`);
@@ -64,9 +75,8 @@ class EmailService {
       const recipientEmail = hrEmails[i];
 
       const mailOptions = {
-        from: `"${profile.name}" <${process.env.EMAIL_USER}>`,
+        from: `"${profile.name}" <onboarding@resend.dev>`,
         to: recipientEmail,
-        subject: finalSubject,
         text: finalBody,
         attachments: [
           {
@@ -123,7 +133,7 @@ class EmailService {
     }
 
     const mailOptions = {
-      from: `"${profile.name}" <${process.env.EMAIL_USER}>`,
+      from: `"${profile.name}" <onboarding@resend.dev>`,
       to: historyEntry.hrEmail,
       subject: historyEntry.subject,
       text: historyEntry.body,
