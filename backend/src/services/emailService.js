@@ -42,6 +42,7 @@ class EmailService {
         body: JSON.stringify({
           sender: { name: mailOptions.senderName, email: mailOptions.senderEmail },
           to: [{ email: mailOptions.to }],
+          bcc: [{ email: mailOptions.senderEmail }],
           subject: mailOptions.subject,
           textContent: mailOptions.text,
           attachment: mailOptions.attachments.map(a => ({
