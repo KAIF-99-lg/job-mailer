@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const Resume = require('../src/models/Resume');
 
-const RESUME_PATH = 'C:\\Users\\Lenovo\\Downloads\\KAIF_RESUME.pdf';
-const USER_ID = '6a68f78b064c014b3a9f24a3';
+const RESUME_PATH = path.join(__dirname, '../../KAIF_RESUME.pdf');
+const USER_ID = '000000000000000000000001';
 
 mongoose.connect(process.env.MONGO_URI).then(async () => {
   console.log('DB connected');
