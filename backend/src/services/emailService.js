@@ -77,6 +77,7 @@ class EmailService {
       const mailOptions = {
         from: `"${profile.name}" <onboarding@resend.dev>`,
         to: recipientEmail,
+        subject: finalSubject,
         text: finalBody,
         attachments: [
           {
