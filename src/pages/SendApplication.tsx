@@ -54,6 +54,7 @@ export default function SendApplication() {
   const [subject, setSubject] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(0)
+  const [totalSent, setTotalSent] = useState(0)
   const [showConfirm, setShowConfirm] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
@@ -186,6 +187,7 @@ export default function SendApplication() {
       }
 
       setSent(data?.data?.successCount ?? 0)
+      setTotalSent(validEmails.length)
       setShowSuccess(true)
     } catch {
       setSendError('Network error. Please check your connection.')
@@ -215,7 +217,7 @@ export default function SendApplication() {
           </div>
           <h2 className="text-[22px] font-semibold text-[var(--color-foreground)] tracking-tight">Emails Sent Successfully</h2>
           <p className="text-[14px] text-[var(--color-muted-foreground)] mt-1.5">
-            {sent} of {validEmails.length} delivered to recipients
+            {sent} of {totalSent} delivered to recipients
           </p>
           <div className="flex items-center justify-center gap-3 mt-6">
             <button
