@@ -6,6 +6,8 @@ const validate = require('../middleware/validate');
 const { mailLimiter } = require('../middleware/rateLimiter');
 const { sendMailValidator } = require('../validators/mailValidator');
 
-router.post('/send', mailLimiter, sendMailValidator, validate, sendMail);
+const { protect } = require('../middleware/auth');
+
+router.post('/send', protect, mailLimiter, sendMailValidator, validate, sendMail);
 
 module.exports = router;
