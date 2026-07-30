@@ -3,10 +3,6 @@ const templateService = require('../services/templateService');
 const asyncHandler = require('../utils/asyncHandler');
 const { sendSuccess } = require('../utils/apiResponse');
 
-/**
- * POST /api/mail/send
- * Validates, fetches template, sends emails sequentially, saves history.
- */
 const sendMail = asyncHandler(async (req, res) => {
   const { role, hrEmails, companyName, hrName, subject, preferredDelay } = req.body;
 
@@ -20,6 +16,7 @@ const sendMail = asyncHandler(async (req, res) => {
     hrName,
     subject,
     bodyTemplate: template.body,
+    userId: req.user._id,
     delayMs,
   });
 

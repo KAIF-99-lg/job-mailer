@@ -49,7 +49,7 @@ export default function SendApplication() {
   const [emailsRaw, setEmailsRaw] = useState('')
   const [company, setCompany] = useState('')
   const [hrName, setHrName] = useState('')
-  const [fileName] = useState('KAIF_RESUME.pdf')
+  const [fileName, setFileName] = useState('')
   const [dragging, setDragging] = useState(false)
   const [subject, setSubject] = useState('')
   const [sending, setSending] = useState(false)
@@ -67,6 +67,16 @@ export default function SendApplication() {
   const emails = parseEmails(emailsRaw)
   const validEmails = emails.filter(validateEmail)
   const maxEmails = 5
+
+  // Fetch existing resume
+  useEffect(() => {
+    fetch(`${API_URL}/resume`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    })
+      .then((r) => r.json())
+      .then((data) => { if (data.success) setFileName(data.data.resume.originalName) })
+      .catch(() => {})
+  }, [])
 
   // Fetch templates
   useEffect(() => {
@@ -107,12 +117,12 @@ export default function SendApplication() {
     try {
       const res = await fetch(`${API_URL}/resume/upload`, {
         method: 'POST',
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         body: formData,
       })
       const data = await res.json()
       if (!res.ok || !data.success) {
         setUploadError(data.message || 'Upload failed.')
-        setFileName('')
       } else {
         setFileName(data.data.resume.originalName)
       }
@@ -329,15 +339,42 @@ export default function SendApplication() {
           <span className="text-[11px] font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wider">Resume</span>
         </div>
         <div className={sectionBody}>
-          <div className="border-2 border-dashed border-[#22C55E]/40 bg-green-50/30 dark:bg-green-900/5 rounded-xl p-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)] flex items-center justify-center">
-              <CheckCircle2 size={16} className="text-[#22C55E]" />
+          {fileName ? (
+            <div className="border-2 border-dashed border-[#22C55E]/40 bg-green-50/30 dark:bg-green-900/5 rounded-xl p-5 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)] flex items-center justify-center">
+                <CheckCircle2 size={16} className="text-[#22C55E]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-medium text-[var(--color-foreground)] truncate">{fileName}</p>
+                <p className="text-[11px] text-[var(--color-muted-foreground)] mt-0.5">✓ Resume ready to send</p>
+              </div>
+              <button onClick={() => fileRef.current?.click()} className="text-[11px] text-[#2563EB] hover:underline shrink-0">Replace</button>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-medium text-[var(--color-foreground)] truncate">KAIF_RESUME.pdf</p>
-              <p className="text-[11px] text-[var(--color-muted-foreground)] mt-0.5">✓ Resume ready to send</p>
+          ) : (
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => fileRef.current?.click()}
+              className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+                dragging ? 'border-[#2563EB] bg-blue-50/30' : 'border-[var(--color-border)] hover:border-[#2563EB]/50'
+              }`}
+            >
+              {uploading ? (
+                <div className="flex items-center justify-center gap-2 text-[13px] text-[var(--color-muted-foreground)]">
+                  <Loader2 size={14} className="animate-spin" /> Uploading...
+                </div>
+              ) : (
+                <>
+                  <Paperclip size={20} className="mx-auto mb-2 text-[var(--color-muted-foreground)]" />
+                  <p className="text-[13px] text-[var(--color-foreground)] font-medium">Drop your resume here or click to upload</p>
+                  <p className="text-[11px] text-[var(--color-muted-foreground)] mt-1">PDF, DOC, DOCX supported</p>
+                </>
+              )}
             </div>
-          </div>
+          )}
+          {uploadError && <p className="text-[11.5px] text-[#EF4444] mt-2">{uploadError}</p>}
+          <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileChange} />
         </div>
       </div>
 

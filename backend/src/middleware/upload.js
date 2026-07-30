@@ -9,9 +9,6 @@ const ALLOWED_MIME_TYPES = [
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-const storage = multer.memoryStorage();
-
-// Multer v2: fileFilter uses Promise-based API
 const fileFilter = async (req, file) => {
   if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     throw new AppError('Only PDF, DOC, and DOCX files are allowed.', 400);
@@ -19,7 +16,7 @@ const fileFilter = async (req, file) => {
 };
 
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter,
 });

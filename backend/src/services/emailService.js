@@ -1,6 +1,8 @@
 const { createTransporter } = require('../config/mailer');
 const { getProfile } = require('../config/profile');
 const EmailHistory = require('../models/EmailHistory');
+const Resume = require('../models/Resume');
+const AppError = require('../utils/AppError');
 const { generateGreeting, replaceTemplateVariables, generateSubject, sleep } = require('../utils/templateHelpers');
 const logger = require('../utils/logger');
 
@@ -9,12 +11,6 @@ class EmailService {
     this.transporter = createTransporter();
   }
 
-  /**
-   * Build the final email body by replacing all template variables.
-   * @param {string} bodyTemplate - Raw template with {{variables}}
-   * @param {object} params
-   * @returns {string}
-   */
   buildEmailBody(bodyTemplate, params) {
     const { hrName, company, role } = params;
     const profile = getProfile();
@@ -37,12 +33,6 @@ class EmailService {
     return replaceTemplateVariables(bodyTemplate, variables);
   }
 
-  /**
-   * Send a single email with one retry on failure.
-   * @param {object} mailOptions - Nodemailer mail options
-   * @param {number} retryCount - Current retry attempt
-   * @returns {Promise<{success: boolean, error: string|null}>}
-   */
   async sendWithRetry(mailOptions) {
     try {
       await this.transporter.sendMail(mailOptions);
@@ -53,24 +43,15 @@ class EmailService {
     }
   }
 
-  /**
-   * Send emails sequentially to multiple recipients with configurable delay.
-   * Saves each result to EmailHistory.
-   *
-   * @param {object} params
-   * @param {string[]} params.hrEmails
-   * @param {string} params.role
-   * @param {string} params.company
-   * @param {string} params.hrName
-   * @param {string} params.subject
-   * @param {string} params.bodyTemplate
-   * @param {object} params.user - Mongoose User document
-   * @param {number} params.delayMs - Delay between emails in ms
-   * @returns {Promise<{results: object[], successCount: number, failedCount: number}>}
-   */
   async sendBulk(params) {
-    const { hrEmails, role, company, hrName, subject, bodyTemplate, delayMs } = params;
+    const { hrEmails, role, company, hrName, subject, bodyTemplate, userId, delayMs } = params;
     const profile = getProfile();
+
+    // Fetch resume from MongoDB
+    const resume = await Resume.findOne({ userId });
+    if (!resume || !resume.fileData) {
+      throw new AppError('No resume found. Please upload your resume first.', 400);
+    }
 
     const finalBody = this.buildEmailBody(bodyTemplate, { hrName, company, role });
     const finalSubject = generateSubject(role, profile.name, subject);
@@ -89,8 +70,8 @@ class EmailService {
         text: finalBody,
         attachments: [
           {
-            filename: profile.resumeFileName,
-            path: profile.resumePath,
+            filename: resume.originalName,
+            content: resume.fileData,
           },
         ],
       };
@@ -98,7 +79,6 @@ class EmailService {
       const { success, error } = await this.sendWithRetry(mailOptions);
 
       let historyId = null;
-
       try {
         const historyEntry = await EmailHistory.create({
           companyName: company || '',
@@ -127,7 +107,6 @@ class EmailService {
       if (success) successCount++;
       else failedCount++;
 
-      // Delay between emails (skip after last one)
       if (i < hrEmails.length - 1) {
         await sleep(Math.max(0, delayMs));
       }
@@ -136,14 +115,13 @@ class EmailService {
     return { results, successCount, failedCount };
   }
 
-  /**
-   * Retry a previously failed email from history.
-   * @param {object} historyEntry - EmailHistory document
-   * @param {object} user - User document
-   * @returns {Promise<object>}
-   */
-  async retryFromHistory(historyEntry) {
+  async retryFromHistory(historyEntry, userId) {
     const profile = getProfile();
+    const resume = await Resume.findOne({ userId });
+    if (!resume || !resume.fileData) {
+      throw new AppError('No resume found. Please upload your resume first.', 400);
+    }
+
     const mailOptions = {
       from: `"${profile.name}" <${process.env.EMAIL_USER}>`,
       to: historyEntry.hrEmail,
@@ -151,8 +129,8 @@ class EmailService {
       text: historyEntry.body,
       attachments: [
         {
-          filename: profile.resumeFileName,
-          path: profile.resumePath,
+          filename: resume.originalName,
+          content: resume.fileData,
         },
       ],
     };
