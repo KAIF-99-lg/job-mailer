@@ -35,8 +35,25 @@ class EmailService {
 
   async sendWithRetry(mailOptions) {
     try {
-      const transport = createTransporter();
-      await transport.sendMail(mailOptions);
+      const { apiKey } = createTransporter();
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender: { name: mailOptions.senderName, email: mailOptions.senderEmail },
+          to: [{ email: mailOptions.to }],
+          subject: mailOptions.subject,
+          textContent: mailOptions.text,
+          attachment: mailOptions.attachments.map(a => ({
+            name: a.filename,
+            content: Buffer.from(a.content).toString('base64'),
+          })),
+        }),
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        return { success: false, error: err.message || 'Brevo API error' };
+      }
       return { success: true, error: null };
     } catch (error) {
       logger.error(`Email send failed: ${error.message}`);
@@ -65,7 +82,8 @@ class EmailService {
       const recipientEmail = hrEmails[i];
 
       const mailOptions = {
-        from: `"${profile.name}" <${profile.email}>`,
+        senderName: profile.name,
+        senderEmail: profile.email,
         to: recipientEmail,
         subject: finalSubject,
         text: finalBody,
@@ -124,7 +142,8 @@ class EmailService {
     }
 
     const mailOptions = {
-      from: `"${profile.name}" <${profile.email}>`,
+      senderName: profile.name,
+      senderEmail: profile.email,
       to: historyEntry.hrEmail,
       subject: historyEntry.subject,
       text: historyEntry.body,
