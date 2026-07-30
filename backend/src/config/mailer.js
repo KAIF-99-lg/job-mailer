@@ -1,16 +1,23 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const logger = require('../utils/logger');
 
-let resendClient = null;
+let transporter = null;
 
 const createTransporter = () => {
-  if (resendClient) return resendClient;
-  resendClient = new Resend(process.env.RESEND_API_KEY);
-  return resendClient;
+  if (transporter) return transporter;
+  transporter = nodemailer.createTransport({
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    auth: {
+      user: process.env.BREVO_SMTP_USER,
+      pass: process.env.BREVO_API_KEY,
+    },
+  });
+  return transporter;
 };
 
 const verifyTransporter = async () => {
-  logger.info('Resend email client initialized.');
+  logger.info('Brevo SMTP transporter initialized.');
 };
 
 module.exports = { createTransporter, verifyTransporter };
